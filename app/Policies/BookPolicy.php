@@ -16,6 +16,11 @@ class BookPolicy
     {
         return true;
     }
+    
+    public function viewTrashed(User $user): bool
+    {
+        return $user->hasRole(['admin', 'manager']);
+    }
 
     public function create(User $user): bool
     {
