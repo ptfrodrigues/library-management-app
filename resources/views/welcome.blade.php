@@ -15,6 +15,7 @@
                                         <th class="py-2 px-4 border-b">Language</th>
                                         <th class="py-2 px-4 border-b">ISBN</th>
                                         <th class="py-2 px-4 border-b">Publication Year</th>
+                                        <th class="py-2 px-4 border-b">Block</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -25,6 +26,7 @@
                                             <td class="py-2 px-4 border-b">{{ $book->language }}</td>
                                             <td class="py-2 px-4 border-b">{{ $book->isbn }}</td>
                                             <td class="py-2 px-4 border-b">{{ $book->publication_year }}</td>
+                                            <td><x-book-card :book="$book" /></td>
                                         </tr>
                                     @endforeach
                                 </tbody>

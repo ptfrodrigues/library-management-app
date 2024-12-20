@@ -18,4 +18,10 @@ class Book extends Model
         'publication_year',
         'observations',
     ];
+
+    public function authors()
+    {
+        return $this->belongsToMany(Author::class);
+    }
 }
+

@@ -2,6 +2,9 @@
 
 return [
     'permissions' => [
+        'dashboard' => [
+            'access_dashboard',
+        ],
         'book' => [
             'view_book',
             'create_book',
@@ -29,10 +32,10 @@ return [
     'roles' => [
         'admin' => '*',
         'manager' => [
-            'book', 'author', 'user',
+            'dashboard','book', 'author', 'user',
         ],
         'librarian' => [
-            'book', 'author',
+            'dashboard','book', 'author',
         ],
         'member' => [
             'loan',

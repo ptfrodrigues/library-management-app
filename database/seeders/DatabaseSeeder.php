@@ -12,22 +12,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(
+        $this->call([
             RolePermissionSeeder::class,
-            AdminUserSeeder::class
-        );
+            AdminUserSeeder::class,
+            AuthorSeeder::class,
+            BookSeeder::class,
+        ]);
 
         User::factory()->create([
-            'name' => 'Test User',
+            'name' => 'Manager User',
             'email' => 'manager@library.com',
         ])->assignRole('manager');
         User::factory()->create([
-            'name' => 'Test User',
+            'name' => 'Librarian User',
             'email' => 'librarian@library.com',
         ])->assignRole('librarian');
         User::factory()->create([
-            'name' => 'Test User',
+            'name' => 'Member User',
             'email' => 'member@library.com',
         ])->assignRole('member');
     }
 }
+

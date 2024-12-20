@@ -4,22 +4,20 @@ namespace App\Policies;
 
 use App\Models\Book;
 use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class BookPolicy
 {
-    public function viewAny(User $user): bool
+    use HandlesAuthorization;
+
+    public function viewAny(?User $user): bool
     {
         return true;
     }
 
-    public function view(User $user, Book $book): bool
+    public function view(?User $user, Book $book): bool
     {
         return true;
-    }
-    
-    public function viewTrashed(User $user): bool
-    {
-        return $user->hasRole(['admin', 'manager']);
     }
 
     public function create(User $user): bool
@@ -34,16 +32,22 @@ class BookPolicy
 
     public function delete(User $user, Book $book): bool
     {
-        return $user->can('soft_delete_book') || $user->can('force_delete_book');
+        return $user->can('delete_book');
     }
 
     public function restore(User $user, Book $book): bool
     {
-        return $user->can('soft_delete_book');
+        return $user->can('restore_book');
     }
 
     public function forceDelete(User $user, Book $book): bool
     {
         return $user->can('force_delete_book');
     }
+
+    public function viewTrashed(User $user): bool
+    {
+        return $user->can('view_trashed_books');
+    }
 }
+

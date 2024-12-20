@@ -19,6 +19,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
+        session(['url.intended' => url()->previous()]);
         return view('auth.register');
     }
 
@@ -45,6 +46,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->intended(url()->previous());
     }
 }
