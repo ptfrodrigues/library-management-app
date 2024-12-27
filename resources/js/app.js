@@ -34,10 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Initial load
     fetchBooks();
 
-    // Search with debounce
     searchBar?.addEventListener('input', () => {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => fetchBooks(searchBar.value.trim()), 300);

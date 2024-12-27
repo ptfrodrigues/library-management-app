@@ -20,7 +20,7 @@ class AppController extends Controller
         return view('pages.home', compact('books', 'search'));
     }
 
-    public function ajaxSearch(Request $request)
+    public function search(Request $request)
     {
         $search = $request->input('search', '');
     

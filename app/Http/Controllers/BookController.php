@@ -3,132 +3,121 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\Author;
 use App\Http\Requests\BookRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    /**
-     * Automatically authorize resource actions for the controller.
-     *
-     * This applies the appropriate policy methods to the resource controller actions:
-     * - index() => viewAny()
-     * - create(), store() => create()
-     * - show() => view()
-     * - edit(), update() => update()
-     * - destroy() => delete()
-     *
-     * Note: Custom methods like trashed(), restore(), and forceDelete() are not
-     * automatically authorized and require explicit checks.
-     */
     public function __construct()
     {
-        $this->authorizeResource(Author::class, 'author');
+        $this->authorizeResource(Book::class, 'book');
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::with('authors')->paginate(10);
-        $title = request()->routeIs('welcome') ? 'Welcome to Our Book Library' : 'Books';
-        $view = request()->routeIs('welcome') ? 'welcome' : 'books.index';
-        
-        return view($view, compact('books', 'title'));
+        $this->authorize('viewAny', Book::class);
+
+        $search = $request->input('search');
+
+        $query = Book::with('authors');
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($user->hasRole('admin')) {
+            $query->withTrashed();
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('genre', 'like', "%{$search}%")
+                  ->orWhere('language', 'like', "%{$search}%")
+                  ->orWhere('isbn', 'like', "%{$search}%")
+                  ->orWhere('year', 'like', "%{$search}%")
+                  ->orWhereHas('authors', function ($authorQuery) use ($search) {
+                      $authorQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $items = $query->paginate(10)->appends(['search' => $search]);
+    
+        $tableFields = ['title', 'genre', 'language', 'isbn', 'year', 'authors'];
+        $fields = array_merge(
+            array_diff(Schema::getColumnListing('books'), ['id', 'created_at', 'updated_at', 'deleted_at']),
+            ['authors']
+        );
+
+        if ($user->hasRole('admin')) {
+            $tableFields[] = 'deleted_at';
+            $fields[] = 'deleted_at';
+        }
+
+        return view('pages.dashboard.books', compact('items', 'tableFields', 'fields'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $authors = Author::all();
-        return view('books.create', compact('authors'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(BookRequest $request)
-    {
-        $validated = $request->validated();
-        $book = Book::create($validated);
-        $book->authors()->attach($validated['authors']);
+    {        
+        $this->authorize('create', Book::class);
+        $validatedData = $request->validated();
 
-        return redirect()->route('books.index')->with('success', 'Book created successfully.');
+        try {
+            DB::beginTransaction();
+            $book = Book::create($validatedData);
+            $book->authors()->attach($validatedData['author_id']);
+            DB::commit();
+            return redirect()->route('dashboard.books.index')->with('success', 'Book created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'An error occurred while creating the book. Please try again.');
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Book $book)
-    {
-        $book->load('authors');
-        return view('books.show', compact('book'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Book $book)
-    {
-        $authors = Author::all();
-        return view('books.edit', compact('book', 'authors'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(BookRequest $request, Book $book)
     {
-        $validated = $request->validated();
-        $book->update($validated);
-        $book->authors()->sync($validated['authors']);
-
-        return redirect()->route('books.index')->with('success', 'Book updated successfully.');
+        $validatedData = $request->validated();
+    
+        try {
+            DB::beginTransaction();
+            $book->update($validatedData);
+            if (isset($validatedData['authors'])) {
+                $book->authors()->sync($validatedData['authors']);
+            }
+            DB::commit();
+    
+            return redirect()->route('dashboard.books')->with('success', 'Book updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating book: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while updating the book: ' . $e->getMessage())->withInput();
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Book $book)
     {
+        $this->authorize('delete', $book);
         $book->delete();
-        return redirect()->route('books.index')->with('success', 'Book soft deleted successfully.');
+        return redirect()->route('dashboard.books')->with('success', 'Book deleted successfully.');
     }
 
-    /**
-     * Display a listing of the soft deleted resources.
-     */
-    public function trashed()
+    public function restore(Book $book)
     {
-        $this->authorize('viewTrashed', Book::class);
-        $books = Book::onlyTrashed()->with('authors')->paginate(10);
-        return view('books.trashed', compact('books'));
-    }
-
-    /**
-     * Restore the specified resource from storage.
-     */
-    public function restore($id)
-    {
-        $book = Book::withTrashed()->findOrFail($id);
         $this->authorize('restore', $book);
         $book->restore();
-        return redirect()->route('books.index')->with('success', 'Book restored successfully.');
+        return redirect()->route('dashboard.books')->with('success', 'Book restored successfully.');
     }
 
-    /**
-     * Remove the specified resource permanently from storage.
-     */
-    public function forceDelete($id)
+    public function forceDelete(Book $book)
     {
-        $book = Book::withTrashed()->findOrFail($id);
         $this->authorize('forceDelete', $book);
         $book->authors()->detach();
         $book->forceDelete();
-        return redirect()->route('books.index')->with('success', 'Book permanently deleted.');
+        return redirect()->route('dashboard.books')->with('success', 'Book permanently deleted.');
     }
 }
 

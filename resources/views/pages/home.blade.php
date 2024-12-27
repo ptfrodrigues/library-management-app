@@ -9,7 +9,7 @@
                 id="search-bar"
                 placeholder="Search books by title..." 
                 class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                data-search-url="{{ route('ajax.search') }}"
+                data-search-url="{{ route('search') }}"
             />
         </div>
         <div id="search-results" class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

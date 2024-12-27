@@ -2,30 +2,75 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
 use App\Models\Book;
+use App\Models\Author;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $this->authorize('viewAny', 'dashboard');
-    
-        $books = Book::with('authors')->take(10)->get();
-        return view('dashboard.index', compact('books'));
+
+        $this->updateStatistics();
+        $statistics = session('dashboard_statistics');
+        $userRoles = $this->getUserRoles();
+
+        return view('pages.dashboard.index', compact('statistics', 'userRoles'));
     }
 
-    public function adminAnalytics()
+    private function updateStatistics()
     {
-        $this->authorize('viewAdminAnalytics', 'dashboard');
+        $statistics = [
+            'books' => Book::count(),
+            'authors' => Author::count(),
+        ];
 
-        return view('dashboard.admin-analytics');
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            $statistics['users'] = User::count();
+            $statistics['roles'] = Role::count();
+            $statistics['permissions'] = Permission::count();
+        } elseif ($user->hasRole('manager')) {
+            $statistics['users'] = User::role(['librarian', 'member'])->count();
+        } elseif ($user->hasRole('librarian')) {
+            $statistics['users'] = User::role('member')->count();
+        }
+
+        session(['dashboard_statistics' => $statistics]);
     }
 
-    public function userActivity()
+    private function getUserRoles()
     {
-        $this->authorize('viewActivity', 'dashboard');
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $userRoles = [];
 
-        return view('dashboard.user-activity');
+        if ($user->hasRole('admin')) {
+            $userRoles = [
+                'admins' => User::role('admin')->count(),
+                'managers' => User::role('manager')->count(),
+                'librarians' => User::role('librarian')->count(),
+                'members' => User::role('member')->count(),
+            ];
+        } elseif ($user->hasRole('manager')) {
+            $userRoles = [
+                'librarians' => User::role('librarian')->count(),
+                'members' => User::role('member')->count(),
+            ];
+        } elseif ($user->hasRole('librarian')) {
+            $userRoles = [
+                'members' => User::role('member')->count(),
+            ];
+        }
+
+        return $userRoles;
     }
+
 }
+

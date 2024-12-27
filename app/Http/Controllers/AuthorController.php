@@ -4,118 +4,110 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use App\Http\Requests\AuthorRequest;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class AuthorController extends Controller
 {
-    /**
-     * Automatically authorize resource actions for the controller.
-     *
-     * This applies the appropriate policy methods to the resource controller actions:
-     * - index() => viewAny()
-     * - create(), store() => create()
-     * - show() => view()
-     * - edit(), update() => update()
-     * - destroy() => delete()
-     *
-     * Note: Custom methods like trashed(), restore(), and forceDelete() are not
-     * automatically authorized and require explicit checks.
-     */
     public function __construct()
     {
         $this->authorizeResource(Author::class, 'author');
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    public function index(Request $request)
     {
-        $authors = Author::paginate(10);
-        return view('authors.index', compact('authors'));
+        $this->authorize('viewAny', Author::class);
+
+        $search = $request->input('search');
+
+        $query = Author::with('books');
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($user->hasRole('admin')) {
+            $query->withTrashed();
+        }
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('country', 'like', "%{$search}%")
+                  ->orWhereHas('books', function ($bookQuery) use ($search) {
+                      $bookQuery->where('title', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $items = $query->paginate(10)->appends(['search' => $search]);
+        $tableFields = ['first_name', 'last_name', 'country', 'books'];
+        $fields = array_merge(
+            array_diff(Schema::getColumnListing('authors'), ['deleted_at']),
+            ['books']
+        );
+        
+        if ($user->hasRole('admin')) {
+            $tableFields[] = 'deleted_at';
+            $fields[] = 'deleted_at';
+        }
+
+        return view('pages.dashboard.authors', compact('items', 'tableFields', 'fields'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('authors.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(AuthorRequest $request)
     {
         $validated = $request->validated();
-        Author::create($validated);
-        return redirect()->route('authors.index')->with('success', 'Author created successfully.');
+        try {
+            DB::beginTransaction();
+            $author = Author::create($validated);
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'author' => [
+                    'id' => $author->id,
+                    'full_name' => $author->full_name,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', 'An error occurred while creating the book. Please try again.');
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Author $author)
     {
-        return view('authors.show', compact('author'));
+        return $author->load('books');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Author $author)
-    {
-        return view('authors.edit', compact('author'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(AuthorRequest $request, Author $author)
     {
         $validated = $request->validated();
         $author->update($validated);
-        return redirect()->route('authors.index')->with('success', 'Author updated successfully.');
+        $author->books()->sync($validated['books']);
+
+        return $author->load('books');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Author $author)
     {
+        $this->authorize('delete', $author);
         $author->delete();
-        return redirect()->route('authors.index')->with('success', 'Author deleted successfully.');
+        return redirect()->route('dashboard.authors')->with('success', 'Author deleted successfully.');
     }
 
-    /**
-     * Display a listing of the soft deleted resources.
-     */
-    public function trashed()
+    public function restore(Author $author)
     {
-        $this->authorize('viewTrashed', Author::class);
-        $authors = Author::onlyTrashed()->paginate(10);
-        return view('authors.trashed', compact('authors'));
-    }
-
-    /**
-     * Restore the specified resource from storage.
-     */
-    public function restore($id)
-    {
-        $author = Author::withTrashed()->findOrFail($id);
         $this->authorize('restore', $author);
         $author->restore();
-        return redirect()->route('authors.index')->with('success', 'Author restored successfully.');
+        return redirect()->route('dashboard.authors')->with('success', 'Author restored successfully.');
     }
 
-    /**
-     * Remove the specified resource permanently from storage.
-     */
-    public function forceDelete($id)
+    public function forceDelete(Author $author)
     {
-        $author = Author::withTrashed()->findOrFail($id);
         $this->authorize('forceDelete', $author);
+        $author->books()->detach();
         $author->forceDelete();
-        return redirect()->route('authors.index')->with('success', 'Author permanently deleted.');
+        return redirect()->route('dashboard.authors')->with('success', 'Author permanently deleted.');
     }
 }
-

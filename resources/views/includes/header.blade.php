@@ -1,1 +1,1 @@
-@include('partials.navigation')
+@include('partials.main-navbar')

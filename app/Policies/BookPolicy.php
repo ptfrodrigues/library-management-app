@@ -22,32 +22,27 @@ class BookPolicy
 
     public function create(User $user): bool
     {
-        return $user->can('create_book');
+        return $user->can('create_books');
     }
 
     public function update(User $user, Book $book): bool
     {
-        return $user->can('update_book');
+        return $user->can('edit_books');
     }
 
     public function delete(User $user, Book $book): bool
     {
-        return $user->can('delete_book');
+        return $user->can('delete_books');
     }
 
     public function restore(User $user, Book $book): bool
     {
-        return $user->can('restore_book');
+        return $user->can('edit_books');
     }
 
     public function forceDelete(User $user, Book $book): bool
     {
-        return $user->can('force_delete_book');
-    }
-
-    public function viewTrashed(User $user): bool
-    {
-        return $user->can('view_trashed_books');
+        return $user->can('force_delete');
     }
 }
 

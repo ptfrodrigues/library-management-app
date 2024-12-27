@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('genre');
             $table->string('language');
             $table->string('isbn')->unique();
-            $table->year('publication_year');
+            $table->year('year');
             $table->text('observations')->nullable();
             $table->timestamps();
             $table->softDeletes();

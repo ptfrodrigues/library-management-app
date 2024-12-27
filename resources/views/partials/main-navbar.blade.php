@@ -14,16 +14,10 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     @can('access_dashboard')
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('pages.dashboard.*')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     @endcan
-                    <x-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')">
-                        {{ __('Books') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('authors.index')" :active="request()->routeIs('authors.*')">
-                        {{ __('Authors') }}
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -61,7 +55,7 @@
                         </x-slot>
                     </x-dropdown>
                 @else
-                    <div class="space-x-8 sm:-my-px sm:ml-10 sm:flex bg-slate-800">
+                    <div class="space-x-8 sm:-my-px sm:ml-10 sm:flex">
                         <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
                             {{ __('Login') }}
                         </x-nav-link>
@@ -89,15 +83,11 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+            @can('access_dashboard')
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('pages.dashboard.*')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')">
-                {{ __('Books') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('authors.index')" :active="request()->routeIs('authors.*')">
-                {{ __('Authors') }}
-            </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

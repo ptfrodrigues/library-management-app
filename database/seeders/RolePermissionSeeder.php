@@ -9,44 +9,54 @@ use Illuminate\Support\Facades\DB;
 
 class RolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Clear cached permissions to avoid conflicts
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $config = config('role_permission');
-        $permissions = $config['permissions'];
-        $roles = $config['roles'];
+        // Create permissions
+        $permissions = [
+            'create_books',
+            'edit_books',
+            'delete_books',
+            'create_authors',
+            'edit_authors',
+            'delete_authors',
+            'view_users',
+            'create_users',
+            'edit_users',
+            'delete_users',
+            'access_dashboard',
+            'force_delete',
+            'view_loan',
+            'start_loan',
+            'end_loan',
+        ];
 
-        DB::transaction(function () use ($permissions, $roles) {
-            // Create permissions dynamically
-            foreach ($permissions as $resource => $actions) {
-                foreach ($actions as $action) {
-                    Permission::updateOrCreate(['name' => $action]);
-                }
-            }
+        foreach ($permissions as $permission) {
+            Permission::create(['name' => $permission]);
+        }
 
-            // Create roles and assign permissions dynamically
-            foreach ($roles as $roleName => $resources) {
-                $role = Role::firstOrCreate(['name' => $roleName]);
+        // Create roles and assign permissions
+        $roles = [
+            'admin' => $permissions,
+            'manager' => [
+                'create_books', 'edit_books', 'delete_books',
+                'create_authors', 'edit_authors', 'delete_authors',
+                'view_users', 'create_users', 'edit_users', 'delete_users',
+                'access_dashboard', 'view_loan',
+            ],
+            'librarian' => [
+                'create_books', 'edit_books',
+                'create_authors', 'edit_authors',
+                'access_dashboard', 'view_users', 'view_loan',
+            ],
+            'member' => ['view_loan', 'start_loan', 'end_loan'],
+        ];
 
-                if ($resources === '*') {
-                    // Grant all permissions to roles like admin
-                    $role->givePermissionTo(Permission::all());
-                } else {
-                    // Gather permissions for the specific resources
-                    $allowedPermissions = [];
-                    foreach ($resources as $resource) {
-                        if (isset($permissions[$resource])) {
-                            $allowedPermissions = array_merge($allowedPermissions, $permissions[$resource]);
-                        }
-                    }
-                    $role->syncPermissions($allowedPermissions);
-                }
-            }
-        });
+        foreach ($roles as $roleName => $rolePermissions) {
+            $role = Role::create(['name' => $roleName]);
+            $role->givePermissionTo($rolePermissions);
+        }
     }
 }
+

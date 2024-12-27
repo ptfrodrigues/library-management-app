@@ -21,7 +21,7 @@ class BookFactory extends Factory
             'genre' => fake()->word,
             'language' => fake()->languageCode,
             'isbn' => fake()->unique()->isbn13,
-            'publication_year' => fake()->year,
+            'year' => fake()->year,
             'observations' => fake()->paragraph,
         ];
     }
