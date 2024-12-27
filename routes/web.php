@@ -10,8 +10,6 @@ use App\Http\Controllers\AppController;
 
 Route::get('/', [AppController::class, 'home'])->name('home');
 Route::get('/search', [AppController::class, 'search'])->name('search');
-Route::get('/books', [BookController::class, 'index'])->name('books.index');
-Route::get('/authors', [AuthorController::class, 'index'])->name('authors.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

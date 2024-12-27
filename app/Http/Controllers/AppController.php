@@ -4,35 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AppController extends Controller
 {
     public function home(Request $request)
     {
         $search = $request->input('search');
+        $query = Book::with('authors');
 
-        $books = Book::with('authors')
-            ->when($search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%");
-            })
-            ->paginate(12);
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('genre', 'like', "%{$search}%")
+                  ->orWhereHas('authors', function ($authorQuery) use ($search) {
+                      $authorQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
+                  });
+            });
+        }
 
-        return view('pages.home', compact('books', 'search'));
+        $books = $query->paginate(20)->appends(['search' => $search]);
+
+        return view('pages.home', compact('books'));
     }
-
-    public function search(Request $request)
-    {
-        $search = $request->input('search', '');
-    
-        $books = Book::with('authors')
-            ->when($search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%");
-            })
-            ->get();
-        return response()->json([
-            'books' => $books,
-        ]);
-    }
-    
-
 }
+

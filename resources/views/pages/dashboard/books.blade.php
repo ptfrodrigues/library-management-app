@@ -15,20 +15,20 @@
                 <span class="block sm:inline">{{ session('error') }}</span>
             </div>
         @endif
-
-        <form action="{{ route('dashboard.books') }}" method="GET" class="mb-6">
-            <div class="flex items-center shadow-sm">
+        
+        <div class="mb-6">
+            <form action="{{ route('dashboard.books') }}" method="GET" class="flex">
                 <input
                     type="text"
                     name="search"
                     placeholder="Search by title, author, genre, language, year or ISBN"
                     value="{{ request('search') }}"
-                    class="flex-grow px-4 py-2 border-2 border-r-0 border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <button type="submit" class="px-6 py-2 bg-blue-500 text-white border-2 border-blue-500 rounded-r-md hover:bg-blue-600 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     Search
                 </button>
-            </div>
+            </form>
             @if(request('search'))
                 <div class="mt-2">
                     <a href="{{ route('dashboard.books') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-150 ease-in-out">
@@ -39,8 +39,7 @@
                     </a>
                 </div>
             @endif
-        </form>
-
+        </div>
         <x-dynamic-table :items="$items" :tableFields="$tableFields" title="Books" />
 
         @foreach ($items as $book)
