@@ -36,18 +36,22 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+    <div class="flex flex-wrap gap-4 mb-12">
         @can('create', App\Models\User::class)
-            <button type="button" onclick="openCreateModal('create-user-modal')" class="bg-primary hover:bg-secondary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+            <button type="button" onclick="openCreateModal('create-user-modal')" class="flex-grow md:flex-grow-1 bg-primary hover:bg-secondary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
                 Create User
             </button>
         @endcan
-        <button type="button" onclick="openCreateModal('create-book-modal')" class="bg-secondary hover:bg-primary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
-            Create Book
-        </button>
-        <button type="button" onclick="openCreateModal('create-author-modal')" class="bg-accent hover:bg-accent-dark text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
-            Create Author
-        </button>
+        @can('create', App\Models\Book::class)
+            <button type="button" onclick="openCreateModal('create-book-modal')" class="flex-grow md:flex-grow-1 bg-secondary hover:bg-primary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+                Create Book
+            </button>
+        @endcan
+        @can('create', App\Models\Author::class)
+            <button type="button" onclick="openCreateModal('create-author-modal')" class="flex-grow md:flex-grow-1 bg-accent hover:bg-accent-dark text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+                Create Author
+            </button>
+        @endcan
     </div>
 
     @can('create', App\Models\User::class)
@@ -68,32 +72,34 @@
             ]"
         />
     @endcan
-
-    <x-dynamic-modal-create 
-        id="create-book-modal"
-        title="Create Book"
-        action="{{ route('dashboard.books.store') }}"
-        :fields="[
-            ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
-            ['name' => 'genre', 'label' => 'Genre', 'type' => 'text'],
-            ['name' => 'language', 'label' => 'Language', 'type' => 'text'],
-            ['name' => 'isbn', 'label' => 'ISBN (13 digits)', 'type' => 'text', 'pattern' => '[0-9]{13}'],
-            ['name' => 'year', 'label' => 'Publication Year', 'type' => 'number', 'min' => 1900, 'max' => date('Y') + 1],
-            ['name' => 'observations', 'label' => 'Observations', 'type' => 'textarea'],
-            ['name' => 'authors[]', 'label' => 'Authors', 'type' => 'select', 'options' => App\Models\Author::all()->pluck('full_name', 'id')->toArray(), 'multiple' => true]
-        ]"
-    />
-
-    <x-dynamic-modal-create 
-        id="create-author-modal"
-        title="Create Author"
-        action="{{ route('dashboard.authors.store') }}"
-        :fields="[
-            ['name' => 'first_name', 'label' => 'First Name', 'type' => 'text'],
-            ['name' => 'last_name', 'label' => 'Last Name', 'type' => 'text'],
-            ['name' => 'country', 'label' => 'Country', 'type' => 'text']
-        ]"
-    />
-
+    @can('create', App\Models\Book::class)
+        <x-dynamic-modal-create 
+            id="create-book-modal"
+            title="Create Book"
+            action="{{ route('dashboard.books.store') }}"
+            :fields="[
+                ['name' => 'title', 'label' => 'Title', 'type' => 'text'],
+                ['name' => 'genre', 'label' => 'Genre', 'type' => 'text'],
+                ['name' => 'language', 'label' => 'Language', 'type' => 'text'],
+                ['name' => 'isbn', 'label' => 'ISBN (13 digits)', 'type' => 'text', 'pattern' => '[0-9]{13}'],
+                ['name' => 'year', 'label' => 'Publication Year', 'type' => 'number', 'min' => 1900, 'max' => date('Y') + 1],
+                ['name' => 'observations', 'label' => 'Observations', 'type' => 'textarea'],
+                ['name' => 'authors[]', 'label' => 'Authors', 'type' => 'select', 'options' => App\Models\Author::all()->pluck('full_name', 'id')->toArray(), 'multiple' => true]
+            ]"
+        />
+    @endcan
+    @can('create', App\Models\Author::class)
+        <x-dynamic-modal-create 
+            id="create-author-modal"
+            title="Create Author"
+            action="{{ route('dashboard.authors.store') }}"
+            :fields="[
+                ['name' => 'first_name', 'label' => 'First Name', 'type' => 'text'],
+                ['name' => 'last_name', 'label' => 'Last Name', 'type' => 'text'],
+                ['name' => 'country', 'label' => 'Country', 'type' => 'text']
+            ]"
+        />
+    @endcan
 </div>
 @endsection
+
