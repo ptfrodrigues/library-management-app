@@ -1,21 +1,30 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     @include('includes.head')
+    <title>{{ config('app.name', 'Laravel') }}</title>
 </head>
-<body>
-<div class="container">
-   <header class="">
-       @include('includes.header')
-       @yield('header-content')
-   </header>
-   <div id="main" class="py-12 text-sm font-medium leading-5 text-gray-500 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           @yield('content')
-   </div>
-   <footer class="py-4 text-sm font-medium leading-5 text-gray-500 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-       @include('includes.footer')
-   </footer>
-</div>
+<body class="font-sans antialiased bg-background text-text">
+    <div class="flex flex-col min-h-screen">
+        <header class="bg-white border-b border-secondary">
+            <div class="container">
+                @include('includes.header')
+                @yield('header-content')
+            </div>
+        </header>
+        <main class="flex-grow">
+            <div id="main" class="py-16 container">
+                @yield('content')
+            </div>
+        </main>
+
+        <footer class="bg-background border-t border-secondary">
+            <div class="container py-12">
+                @include('includes.footer')
+            </div>
+        </footer>
+    </div>
+
+    @stack('scripts')
 </body>
 </html>
-

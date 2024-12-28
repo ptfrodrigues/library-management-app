@@ -10,22 +10,27 @@ class AppController extends Controller
 {
     public function home(Request $request)
     {
-        $search = $request->input('search');
-        $query = Book::with('authors');
+        $bookController = new BookController();
+        $data = $bookController->index($request);
+        
+        $books = $data->getData()['items'];
+        $languages = $data->getData()['languages'];
+        $genres = $data->getData()['genres'];
+        $years = $data->getData()['years'];
+        $authors = $data->getData()['authors'];
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('genre', 'like', "%{$search}%")
-                  ->orWhereHas('authors', function ($authorQuery) use ($search) {
-                      $authorQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%");
-                  });
-            });
+        if (!$books instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            $perPage = 12;
+            $books = new \Illuminate\Pagination\LengthAwarePaginator(
+                $books->forPage($request->get('page', 1), $perPage),
+                $books->count(),
+                $perPage,
+                $request->get('page', 1),
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
         }
 
-        $books = $query->paginate(20)->appends(['search' => $search]);
-
-        return view('pages.home', compact('books'));
+        return view('pages.home', compact('books', 'languages', 'genres', 'years', 'authors'));
     }
 }
 

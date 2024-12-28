@@ -1,17 +1,17 @@
 @props(['item', 'fields', 'title'])
 
 <div id="dynamic-modal-{{ $item->id }}" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
-        <h2 class="text-2xl font-bold mb-4">{{ $title }}</h2>
+    <div class="bg-background rounded-lg shadow-xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto border border-secondary">
+        <h2 class="text-3xl font-display font-bold mb-6 text-primary">{{ $title }}</h2>
         
         <div id="view-mode-{{ $item->id }}">
-            <ul class="list-none space-y-2 text-sm text-gray-600">
+            <ul class="list-none space-y-4 text-sm text-text">
                 @foreach($fields as $field)
-                    @if(!in_array($field, ['password', 'remember_token']))
+                    @if(!in_array($field, ['password', 'remember_token', 'deleted_at']) || ($field === 'deleted_at' && $item->deleted_at !== null))
                         <li>
-                            <strong>{{ ucfirst(str_replace('_', ' ', $field)) }}:</strong>
+                            <strong class="text-accent">{{ ucfirst(str_replace('_', ' ', $field)) }}:</strong>
                             @if($field === 'permissions')
-                                <ul class="list-disc pl-5">
+                                <ul class="list-disc pl-5 mt-2">
                                     @foreach($item->getAllPermissions() as $permission)
                                         <li>{{ str_replace('_', ' ', $permission->name) }}</li>
                                     @endforeach
@@ -19,13 +19,13 @@
                             @elseif($field === 'roles')
                                 {{ $item->roles->pluck('name')->implode(', ') }}
                             @elseif($field === 'authors')
-                                <ul class="list-disc pl-5">
+                                <ul class="list-disc pl-5 mt-2">
                                     @foreach($item->authors as $author)
                                         <li>{{ $author->first_name }} {{ $author->last_name }}</li>
                                     @endforeach
                                 </ul>
                             @elseif($field === 'books')
-                                <ul class="list-disc pl-5">
+                                <ul class="list-disc pl-5 mt-2">
                                     @foreach($item->books as $book)
                                         <li>{{ $book->title }}</li>
                                     @endforeach
@@ -39,11 +39,10 @@
             </ul>
         </div>
 
-        <div class="mt-6 flex justify-end">
-            <button onclick="closeModal({{ $item->id }})" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-150 ease-in-out">
+        <div class="mt-8 flex justify-end">
+            <button onclick="closeModal({{ $item->id }})" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-secondary transition-colors duration-300">
                 Close
             </button>
         </div>
     </div>
 </div>
-

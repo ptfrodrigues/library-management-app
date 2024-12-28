@@ -13,16 +13,27 @@ class BookRequest extends FormRequest
 
     public function rules()
     {
-        return [
+        $rules = [
             'title' => 'required|string|max:255',
             'genre' => 'required|string|max:255',
             'language' => 'required|string|max:255',
-            'isbn' => 'required|string|max:255|unique:books,isbn,' . $this->route('book')->id,
             'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'authors' => 'required|array|min:1',
+            'authors' => 'nullable|array',
             'authors.*' => 'exists:authors,id',
             'observations' => 'nullable|string',
         ];
+
+        if ($this->isMethod('POST')) {
+            $rules['isbn'] = 'required|string|digits:13|unique:books,isbn';
+        } 
+        else {
+            $rules = array_map(function ($rule) {
+                return 'sometimes|' . $rule;
+            }, $rules);
+
+            $rules['isbn'] = 'sometimes|required|string|digits:13|unique:books,isbn,' . $this->route('book')->id;
+        }
+
+        return $rules;
     }
 }
-

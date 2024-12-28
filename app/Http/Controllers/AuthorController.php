@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AuthorController extends Controller
 {
@@ -40,7 +41,7 @@ class AuthorController extends Controller
             });
         }
 
-        $items = $query->paginate(10)->appends(['search' => $search]);
+        $items = $query->paginate(12)->appends(['search' => $search]);
         $tableFields = ['first_name', 'last_name', 'country', 'books'];
         $fields = array_merge(
             array_diff(Schema::getColumnListing('authors'), ['deleted_at']),
@@ -60,18 +61,13 @@ class AuthorController extends Controller
         $validated = $request->validated();
         try {
             DB::beginTransaction();
-            $author = Author::create($validated);
+            Author::create($validated);
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'author' => [
-                    'id' => $author->id,
-                    'full_name' => $author->full_name,
-                ],
-            ]);
+            return redirect()->route('dashboard')->with('success', 'Author created successfully.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'An error occurred while creating the book. Please try again.');
+            return redirect()->back()->withInput()->with('error', 'An error occurred while creating the author. Please try again.');
         }
     }
 
@@ -82,32 +78,84 @@ class AuthorController extends Controller
 
     public function update(AuthorRequest $request, Author $author)
     {
-        $validated = $request->validated();
-        $author->update($validated);
-        $author->books()->sync($validated['books']);
+        $this->authorize('edit_authors', Author::class);
 
-        return $author->load('books');
+        $validated = $request->validated();
+
+        try {
+            DB::beginTransaction();
+        
+            $author->update([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'country' => $validated['country'],
+            ]);
+        
+            if (isset($validated['books'])) {
+                $author->books()->sync($validated['books']);
+            } else {
+                $author->books()->detach();
+            }
+        
+            DB::commit();
+        
+            return redirect()->route('dashboard.authors')->with('success', 'Author updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating author: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while updating the author: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function destroy(Author $author)
     {
         $this->authorize('delete', $author);
-        $author->delete();
-        return redirect()->route('dashboard.authors')->with('success', 'Author deleted successfully.');
+        try {
+            DB::beginTransaction();
+            $author->delete();
+            DB::commit();
+            return redirect()->route('dashboard.authors')->with('success', 'Author deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error deleting author: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while deleting the author: ' . $e->getMessage());
+        }
     }
 
-    public function restore(Author $author)
+    public function restore($id)
     {
+        $author = Author::withTrashed()->findOrFail($id);
         $this->authorize('restore', $author);
-        $author->restore();
-        return redirect()->route('dashboard.authors')->with('success', 'Author restored successfully.');
+        try {
+            DB::beginTransaction();
+            $author->restore();
+            $author->books()->withTrashed()->updateExistingPivot(
+                $author->books()->withTrashed()->pluck('books.id'),
+                ['deleted_at' => null]
+            );
+            DB::commit();
+            return redirect()->route('dashboard.authors')->with('success', 'Author restored successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error restoring author: ' . $e->getMessage(), ['author_id' => $id, 'exception' => $e]);
+            return redirect()->back()->with('error', 'An error occurred while restoring the author: ' . $e->getMessage());
+        }
     }
 
     public function forceDelete(Author $author)
     {
         $this->authorize('forceDelete', $author);
-        $author->books()->detach();
-        $author->forceDelete();
-        return redirect()->route('dashboard.authors')->with('success', 'Author permanently deleted.');
+        try {
+            DB::beginTransaction();
+            $author->books()->detach();
+            $author->forceDelete();
+            DB::commit();
+            return redirect()->route('dashboard.authors')->with('success', 'Author permanently deleted.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error force deleting author: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while permanently deleting the author: ' . $e->getMessage());
+        }
     }
 }
+

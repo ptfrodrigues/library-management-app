@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController;
 
 Route::get('/', [AppController::class, 'home'])->name('home');
-Route::get('/search', [AppController::class, 'search'])->name('search');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -30,16 +29,12 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/dashboard/authors/{author}/restore', [AuthorController::class, 'restore'])->name('dashboard.authors.restore')->withTrashed();
     Route::delete('/dashboard/authors/{author}/force', [AuthorController::class, 'forceDelete'])->name('dashboard.authors.forceDelete')->withTrashed();
 
-
     // Users routes
     Route::get('/dashboard/users', [UserController::class, 'index'])->name('dashboard.users');
-    Route::post('/dashboard/users', [UserController::class, 'store'])->name('dashboard.users.store');
+    Route::post('/dashboard/users/store', [UserController::class, 'store'])->name('dashboard.user.store');
     Route::put('/dashboard/users/{user}', [UserController::class, 'update'])->name('dashboard.users.update');
     Route::delete('/dashboard/users/{user}', [UserController::class, 'destroy'])->name('dashboard.users.destroy');
 
-
-    // New route for creating a user
-    Route::post('/dashboard/create-user', [DashboardController::class, 'createUser'])->name('dashboard.create.user');
 });
 
 Route::middleware('auth')->group(function () {

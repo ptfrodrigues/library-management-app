@@ -1,13 +1,16 @@
 @extends('layouts.default')
+
 @section('header-content')
-    @include('partials.secondary-navbar')
+@include('partials.secondary-navbar')
 @stop
+
 @section('content')
-    <div id="main" class=" leading-5 text-gray-500 max-w-7xl mx-auto">
+
+    <div id="main" class="container mx-auto px-4 py-8 text-text">
+        
         @yield('dashboard-content')
     </div>
 @stop
-
 
 <script>
     function openModal(id) {
@@ -32,5 +35,13 @@
 
     function closeActionModal(id, action) {
         document.getElementById(`dynamic-modal-${action}-${id}`).classList.add('hidden');
+    }
+
+    function openCreateModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeCreateModal(id) {
+        document.getElementById(id).classList.add('hidden');
     }
 </script>

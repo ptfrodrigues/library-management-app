@@ -12,6 +12,7 @@ use App\Policies\UserPolicy;
 
 use Illuminate\Support\Facades\Gate;
 use App\Policies\DashboardPolicy;
+use Illuminate\Pagination\Paginator;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -35,6 +36,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy('dashboard', DashboardPolicy::class);
+        Paginator::useTailwind();
     }
 
 }

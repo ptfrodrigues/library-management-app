@@ -17,6 +17,9 @@ class AuthorRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'country' => 'required|string|max:255',
+            'books' => 'nullable|array',
+            'books.*' => 'exists:books,id',
         ];
     }
 }
+

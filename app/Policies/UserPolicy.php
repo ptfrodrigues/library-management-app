@@ -14,7 +14,14 @@ class UserPolicy
 
     public function view(User $user, User $model): bool
     {
-        return $user->can('view_users');
+        if ($user->hasRole('admin')) {
+            return true;
+        } elseif ($user->hasRole('manager')) {
+            return $model->hasRole(['librarian', 'member']);
+        } elseif ($user->hasRole('librarian')) {
+            return $model->hasRole('member');
+        }
+        return false;
     }
 
     public function create(User $user): bool
@@ -24,23 +31,24 @@ class UserPolicy
 
     public function update(User $user, User $model): bool
     {
-        return $user->can('edit_users');
+        if ($user->hasRole('admin')) {
+            return true;
+        } elseif ($user->hasRole('manager')) {
+            return $model->hasRole('librarian');
+        }
+        return false;
     }
 
     public function delete(User $user, User $model): bool
     {
-        return $user->can('delete_users');
-    }
-
-    public function restore(User $user, User $model): bool
-    {
-        return $user->can('edit_users');
-    }
-
-    public function forceDelete(User $user, User $model): bool
-    {
-        return $user->can('force_delete');
+        if ($user->hasRole('admin')) {
+            return true;
+        } elseif ($user->hasRole('manager')) {
+            return $model->hasRole('librarian');
+        }
+        return false;
     }
 }
+
 
 
