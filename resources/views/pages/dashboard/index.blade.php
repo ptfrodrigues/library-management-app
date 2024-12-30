@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
-@section('content')
-<div class="container mx-auto py-12">
+@section('dashboard-content')
+<div class="container mx-auto mt-20 py-12">
     <h1 class="text-4xl font-display font-bold mb-8 text-primary">Overview</h1>
 
     @if(session('success'))
@@ -38,17 +38,17 @@
 
     <div class="flex flex-wrap gap-4 mb-12">
         @can('create', App\Models\User::class)
-            <button type="button" onclick="openCreateModal('create-user-modal')" class="flex-grow md:flex-grow-1 bg-primary hover:bg-secondary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+            <button type="button" onclick="openCreateModal('create-user-modal')" class="flex-grow md:flex-grow-1 bg-primary hover:bg-tertiary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
                 Create User
             </button>
         @endcan
         @can('create', App\Models\Book::class)
-            <button type="button" onclick="openCreateModal('create-book-modal')" class="flex-grow md:flex-grow-1 bg-secondary hover:bg-primary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+            <button type="button" onclick="openCreateModal('create-book-modal')" class="flex-grow md:flex-grow-1 bg-secondary hover:bg-tertiary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
                 Create Book
             </button>
         @endcan
         @can('create', App\Models\Author::class)
-            <button type="button" onclick="openCreateModal('create-author-modal')" class="flex-grow md:flex-grow-1 bg-accent hover:bg-accent-dark text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
+            <button type="button" onclick="openCreateModal('create-author-modal')" class="flex-grow md:flex-grow-1 bg-accent hover:bg-tertiary text-white font-bold py-3 px-6 rounded-lg transition-colors duration-300">
                 Create Author
             </button>
         @endcan

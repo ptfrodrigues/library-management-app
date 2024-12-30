@@ -17,10 +17,11 @@ class BookRequest extends FormRequest
             'title' => 'required|string|max:255',
             'genre' => 'required|string|max:255',
             'language' => 'required|string|max:255',
-            'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
+            'year' => 'required|integer|min:1000|max:' . (date('Y') + 1),
             'authors' => 'nullable|array',
             'authors.*' => 'exists:authors,id',
             'observations' => 'nullable|string',
+            'cover_url' => 'nullable|url',
         ];
 
         if ($this->isMethod('POST')) {

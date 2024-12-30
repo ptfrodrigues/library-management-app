@@ -6,8 +6,11 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Services\CatalogService;
+use App\Models\Catalog;
 
 class DashboardController extends Controller
 {

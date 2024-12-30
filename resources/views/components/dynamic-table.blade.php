@@ -6,7 +6,7 @@
         text-overflow: clip;
     }
     .trashed-row {
-        background-color: rgba(254, 242, 242, 0.5);
+        background-color: rgba(230, 218, 178, 0.5);
     }
 </style>
 
@@ -116,6 +116,8 @@
                                         <span class="ml-1">Delete</span>
                                     </button>
                                 @endif
+                                <x-catalog-button :item="$item" />
+
                             @endif</div>
                         </div>
                     </td>

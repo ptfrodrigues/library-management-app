@@ -16,6 +16,7 @@ class BookFactory extends Factory
      */
     public function definition(): array
     {
+        $totalCopies = fake()->numberBetween(1, 10);
         return [
             'title' => fake()->sentence(3),
             'genre' => fake()->word,

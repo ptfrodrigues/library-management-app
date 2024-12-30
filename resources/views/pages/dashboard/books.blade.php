@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('dashboard-content')
-    <div class="container mx-auto py-12">
+    <div class="container mx-auto mt-20 py-12">
         <h1 class="text-4xl font-display font-bold mb-8 text-primary">Books</h1>
 
         @if(session('success'))
@@ -51,6 +51,7 @@
             @else
                 <x-dynamic-modal-edit :item="$book" :fields="$fields" title="Book" route="dashboard.books.update"/>
                 <x-dynamic-modal-action :item="$book" :route="'dashboard.books.destroy'" :action="'delete'" />
+                <x-catalog-button :item="$book" />
             @endif
         @endforeach
     </div>

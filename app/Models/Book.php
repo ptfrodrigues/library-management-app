@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasTableFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
 
 class Book extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasTableFields;
 
     protected $fillable = [
         'title',
@@ -17,7 +19,10 @@ class Book extends Model
         'isbn',
         'year',
         'observations',
+        'cover_url',
     ];
+    
+    protected static $tableFields = ['title', 'genre', 'language', 'isbn', 'year', 'authors'];
 
     public function authors()
     {
@@ -25,6 +30,11 @@ class Book extends Model
                     ->withTimestamps()
                     ->withTrashed()
                     ->withPivot('deleted_at');
+    }
+
+    public function catalog()
+    {
+        return $this->hasOne(Catalog::class);
     }
 
     protected static function boot()
@@ -54,5 +64,6 @@ class Book extends Model
     {
         return $query->onlyTrashed()->with('authors');
     }
+
 }
 

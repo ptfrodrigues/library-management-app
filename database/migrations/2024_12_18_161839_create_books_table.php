@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('books', function (Blueprint $table) {
@@ -17,16 +14,14 @@ return new class extends Migration
             $table->string('genre');
             $table->string('language');
             $table->string('isbn')->unique();
-            $table->year('year');
+            $table->integer('year')->nullable(); // troca de year para integer por extrair o ano do campo
             $table->text('observations')->nullable();
+            $table->string('cover_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('books');

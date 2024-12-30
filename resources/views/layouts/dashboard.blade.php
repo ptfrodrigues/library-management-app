@@ -1,4 +1,4 @@
-@extends('layouts.default')
+@extends('layouts.app')
 
 @section('header-content')
 @include('partials.secondary-navbar')
@@ -6,7 +6,7 @@
 
 @section('content')
 
-    <div id="main" class="container mx-auto px-4 py-8 text-text">
+    <div id="main" class=" mx-auto px-4 py-8 text-text">
         
         @yield('dashboard-content')
     </div>

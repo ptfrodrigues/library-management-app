@@ -1,12 +1,14 @@
-<nav x-data="{ open: false }" class="bg-white">
+<nav x-data="{ open: false, showSearch: false, isDashboard: {{ request()->routeIs('dashboard') || request()->routeIs('dashboard.*') ? 'true' : 'false' }}}" 
+     class="fixed top-0 left-0 w-full z-50 shadow-sm bg-white/90 backdrop-blur-md"
+     @scroll.window="showSearch = !isDashboard && (window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) > 0.20">
     <!-- Primary Navigation Menu -->
-    <div class="">
-        <div class="flex justify-between items-center h-20">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center h-16 md:h-20">
             <div class="flex items-center">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
                     <a href="{{ route('home') }}" class="text-primary font-display text-2xl">
-                        <x-application-logo class="block h-10 w-auto fill-current" />
+                        <x-application-logo class="w-8 h-8 md:w-12 md:h-12 text-primary" />                    
                     </a>
                 </div>
 
@@ -124,5 +126,19 @@
                 </div>
             @endauth
         </div>
+    </div>
+    <div class="container mx-auto px-4">
+        @yield('header-content')
+    </div>
+    <div class="py-2"
+         x-show="showSearch && !isDashboard" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform -translate-y-2"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform -translate-y-2"
+         class="w-full bg-white shadow-md">
+        @include('partials.search-bar')
     </div>
 </nav>

@@ -27,9 +27,10 @@ class RolePermissionSeeder extends Seeder
             'delete_users',
             'access_dashboard',
             'force_delete',
-            'view_loan',
-            'start_loan',
-            'end_loan',
+            'view_catalog',
+            'create_catalog',
+            'edit_catalog',
+            'delete_catalog',
         ];
 
         foreach ($permissions as $permission) {
@@ -43,14 +44,16 @@ class RolePermissionSeeder extends Seeder
                 'create_books', 'edit_books', 'delete_books',
                 'create_authors', 'edit_authors', 'delete_authors',
                 'view_users', 'create_users', 'edit_users', 'delete_users',
-                'access_dashboard', 'view_loan',
+                'access_dashboard',
+                'view_catalog', 'create_catalog', 'edit_catalog', 'delete_catalog',
             ],
             'librarian' => [
                 'create_books', 'edit_books',
                 'create_authors', 'edit_authors',
-                'access_dashboard', 'view_users', 'view_loan',
+                'access_dashboard', 'view_users',
+                'view_catalog',
             ],
-            'member' => ['view_loan', 'start_loan', 'end_loan'],
+            'member' => ['view_catalog'],
         ];
 
         foreach ($roles as $roleName => $rolePermissions) {
@@ -59,4 +62,3 @@ class RolePermissionSeeder extends Seeder
         }
     }
 }
-

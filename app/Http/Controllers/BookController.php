@@ -84,11 +84,8 @@ class BookController extends Controller
 
         $items = $query->paginate(12)->appends($request->all());
     
-        $tableFields = ['title', 'genre', 'language', 'isbn', 'year', 'authors'];
-        $fields = array_merge(
-            array_diff(Schema::getColumnListing('books'), ['id', 'created_at', 'updated_at', 'deleted_at']),
-            ['authors']
-        );
+        $tableFields = Book::getTableFields();
+        $fields = Book::getAllFields();
 
         if ($user && $user->hasRole('admin')) {
             $tableFields[] = 'deleted_at';

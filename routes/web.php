@@ -5,8 +5,10 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController;
+use App\Http\Controllers\CatalogViewController;
 
 Route::get('/', [AppController::class, 'home'])->name('home');
 
@@ -34,13 +36,29 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/users/store', [UserController::class, 'store'])->name('dashboard.user.store');
     Route::put('/dashboard/users/{user}', [UserController::class, 'update'])->name('dashboard.users.update');
     Route::delete('/dashboard/users/{user}', [UserController::class, 'destroy'])->name('dashboard.users.destroy');
-
+    
+    // Catalog routes
+    //Route::get('/dashboard/catalogs', [CatalogController::class, 'index'])->name('dashboard.catalogs');
+    //Route::post('/dashboard/catalogs', [CatalogController::class, 'store'])->name('dashboard.catalogs.store');
+    //Route::put('/dashboard/catalogs/{catalog}/update', [CatalogController::class, 'update'])->name('dashboard.catalogs.update');
+    //Route::delete('/dashboard/catalogs/{catalog}', [CatalogController::class, 'destroy'])->name('dashboard.catalogs.destroy');
+    //Route::put('/dashboard/catalogs/{catalog}/restore', [CatalogController::class, 'restore'])->name('dashboard.catalogs.restore')->withTrashed();
+    //Route::delete('/dashboard/catalogs/{catalog}/force', [CatalogController::class, 'forceDelete'])->name('dashboard.catalogs.forceDelete')->withTrashed();
 });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::get('catalogs', [CatalogViewController::class, 'index'])->name('catalogs');
+        Route::resource('catalogs', CatalogController::class)->except(['index', 'create']);
+    });
 });
 
 require __DIR__.'/auth.php';
