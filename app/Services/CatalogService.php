@@ -58,7 +58,7 @@ class CatalogService
         $catalog->moveOrderDown();
     }
 
-    public function getFilteredCatalog(array $filters, int $perPage = 10): LengthAwarePaginator
+    public function getFilteredCatalog(array $filters, int $perPage = 12): LengthAwarePaginator
     {
         return $this->catalogQuery
             ->applyFilters($filters)

@@ -7,7 +7,7 @@
             <div class="flex items-center">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                    <a href="{{ route('home') }}" class="text-primary font-display text-2xl">
+                    <a href="{{ route('index') }}" class="text-primary font-display text-2xl">
                         <x-application-logo class="w-8 h-8 md:w-12 md:h-12 text-primary" />                    
                     </a>
                 </div>
@@ -15,9 +15,14 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 ml-10 sm:flex">
                     @can('access_dashboard')
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('pages.dashboard.*')" class="text-text hover:text-primary transition-colors duration-200">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('pages.dashboard.*')" class="text-text hover:text-primary transition-colors duration-200">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('view_catalog')
+                        <x-nav-link :href="route('home')" :active="request()->routeIs('home')" class="text-text hover:text-primary transition-colors duration-200">
+                            {{ __('Books') }}
+                        </x-nav-link>
                     @endcan
                 </div>
             </div>
@@ -129,16 +134,5 @@
     </div>
     <div class="container mx-auto px-4">
         @yield('header-content')
-    </div>
-    <div class="py-2"
-         x-show="showSearch && !isDashboard" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 transform -translate-y-2"
-         x-transition:enter-end="opacity-100 transform translate-y-0"
-         x-transition:leave="transition ease-in duration-300"
-         x-transition:leave-start="opacity-100 transform translate-y-0"
-         x-transition:leave-end="opacity-0 transform -translate-y-2"
-         class="w-full bg-white shadow-md">
-        @include('partials.search-bar')
     </div>
 </nav>

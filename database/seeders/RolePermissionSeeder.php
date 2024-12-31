@@ -37,7 +37,6 @@ class RolePermissionSeeder extends Seeder
             Permission::create(['name' => $permission]);
         }
 
-        // Create roles and assign permissions
         $roles = [
             'admin' => $permissions,
             'manager' => [

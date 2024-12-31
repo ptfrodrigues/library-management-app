@@ -32,52 +32,41 @@ class CatalogTable extends Component
         $this->filterOptions = $catalogService->getFilterOptions();
     }
 
-    public function updatingSearch()
+    public function updatedSearch()
     {
         $this->resetPage();
     }
 
-    public function updatingLanguage()
+    public function updatedLanguage()
     {
         $this->resetPage();
     }
 
-    public function updatingGenre()
+    public function updatedGenre()
     {
         $this->resetPage();
     }
 
-    public function updatingYear()
+    public function updatedYear()
     {
         $this->resetPage();
     }
 
-    public function updatingAuthor()
+    public function updatedAuthor()
     {
         $this->resetPage();
     }
 
-    public function updatingSort()
+    public function updatedSort()
     {
         $this->resetPage();
     }
 
     public function render(CatalogService $catalogService)
     {
-        $catalogs = [];
-
-        if ($this->readyToLoad) {
-            $filters = [
-                'search' => $this->search,
-                'language' => $this->language,
-                'genre' => $this->genre,
-                'year' => $this->year,
-                'author' => $this->author,
-                'sort' => $this->sort,
-            ];
-
-            $catalogs = $catalogService->getFilteredCatalog($filters, $this->perPage);
-        }
+        $catalogs = $this->readyToLoad
+            ? $catalogService->getFilteredCatalog($this->getFilters(), $this->perPage)
+            : [];
 
         return view('livewire.catalog-table', [
             'catalogs' => $catalogs,
@@ -89,36 +78,40 @@ class CatalogTable extends Component
         $this->readyToLoad = true;
     }
 
-    public function toggleFeatured($catalogId)
+    public function toggleFeatured(Catalog $catalog)
     {
-        $this->authorize('update', Catalog::find($catalogId));
-        
-        $catalog = Catalog::findOrFail($catalogId);
+        $this->authorize('update', $catalog);
         $catalog->update(['is_featured' => !$catalog->is_featured]);
     }
 
-    public function moveUp($catalogId)
+    public function moveUp(Catalog $catalog)
     {
-        $this->authorize('update', Catalog::find($catalogId));
-        
-        $catalog = Catalog::findOrFail($catalogId);
+        $this->authorize('update', $catalog);
         $catalog->moveOrderUp();
     }
 
-    public function moveDown($catalogId)
+    public function moveDown(Catalog $catalog)
     {
-        $this->authorize('update', Catalog::find($catalogId));
-        
-        $catalog = Catalog::findOrFail($catalogId);
+        $this->authorize('update', $catalog);
         $catalog->moveOrderDown();
     }
 
-    public function removeFromCatalog($catalogId)
+    public function removeFromCatalog(Catalog $catalog)
     {
-        $this->authorize('delete', Catalog::find($catalogId));
-        
-        $catalog = Catalog::findOrFail($catalogId);
+        $this->authorize('delete', $catalog);
         $catalog->delete();
+    }
+
+    protected function getFilters(): array
+    {
+        return [
+            'search' => $this->search,
+            'language' => $this->language,
+            'genre' => $this->genre,
+            'year' => $this->year,
+            'author' => $this->author,
+            'sort' => $this->sort,
+        ];
     }
 }
 

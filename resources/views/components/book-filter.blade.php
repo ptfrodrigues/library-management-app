@@ -1,6 +1,32 @@
 @props(['languages', 'genres', 'years', 'authors', 'route'])
 
-<form id="book-filter-form" action="{{ $route }}" class="space-y-8">
+<form id="book-filter-form" action="{{ $route }}" class="py-8 space-y-8">
+    <div id="search-container" class="flex flex-col md:flex-row md:items-center md:space-x-6">
+        <div class="flex-grow  md:mb-0">
+            <input 
+                type="text" 
+                name="search"
+                id="search-input"
+                placeholder="Search books" 
+                value="{{ request('search') }}"
+                class="w-full px-4 py-3 border-b-2 border-secondary focus:border-primary focus:outline-none text-sm bg-background transition-colors duration-300"
+            />
+        </div>
+        <div class="hidden md:flex space-x-4">
+            <button type="submit" class="bg-primary text-white px-8 py-3 hover:bg-secondary transition duration-300 ease-in-out text-sm font-semibold">
+                Search
+            </button>
+            @if(request('search'))
+                <button 
+                    type="button" 
+                    onclick="clearFilters()"
+                    class="bg-secondary text-white px-8 py-3 hover:bg-primary transition duration-300 ease-in-out text-sm font-semibold"
+                >
+                    Clear
+                </button>
+            @endif
+        </div>
+    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <select name="language" id="language-select" class="w-full text-sm px-4 py-3 border-b-2 border-secondary focus:border-primary focus:outline-none filter-select bg-background transition-colors duration-300">

@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\CatalogViewController;
 
-Route::get('/', [AppController::class, 'home'])->name('home');
+Route::get('/', [AppController::class, 'index'])->name('index');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    //Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Books routes
     Route::get('/dashboard/books', [BookController::class, 'index'])->name('dashboard.books');
@@ -52,7 +52,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
 Route::middleware(['auth'])->group(function () {
+    Route::get('/home', [AppController::class, 'home'])->name('home');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     Route::prefix('dashboard')->name('dashboard.')->group(function () {

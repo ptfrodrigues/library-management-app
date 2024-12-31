@@ -84,7 +84,7 @@ class BookController extends Controller
 
         $items = $query->paginate(12)->appends($request->all());
     
-        $tableFields = Book::getTableFields();
+        $tableFields = Book::getVisibleFields();
         $fields = Book::getAllFields();
 
         if ($user && $user->hasRole('admin')) {

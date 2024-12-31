@@ -21,7 +21,7 @@ class CatalogViewController extends Controller
 
         $items = $this->catalogService->getFilteredCatalog($request->all());
         $fields = Catalog::getAllFields();
-        $tableFields = Catalog::getTableFields();
+        $tableFields = Catalog::getVisibleFields();
 
         return view('pages.dashboard.catalogs', compact('items', 'fields', 'tableFields'));
     }
@@ -30,6 +30,6 @@ class CatalogViewController extends Controller
     {
         $items = $this->catalogService->getFilteredCatalog($request->all());
 
-        return view('home', compact('items'));
+        return view('pages.home', compact('items'));
     }
 }

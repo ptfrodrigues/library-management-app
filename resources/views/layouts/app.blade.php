@@ -11,7 +11,7 @@
                 @include('includes.header')
             </div>
         </header>
-        <main class="flex-grow">
+        <main class="flex-grow py-24">
             <div id="main" class="">
                 @yield('content')
             </div>

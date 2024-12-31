@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasTableFields;
+use App\Traits\VisibleFields;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Schema;
 
 class Book extends Model
 {
-    use HasFactory, SoftDeletes, HasTableFields;
+    use HasFactory, SoftDeletes, VisibleFields;
 
     protected $fillable = [
         'title',
@@ -21,6 +22,18 @@ class Book extends Model
         'observations',
         'cover_url',
     ];
+
+    protected static $visibleFields = [
+        'title',
+        'genre',
+        'language',
+        'isbn',
+        'year',
+        'authors',
+    ];
+
+    protected $appends = ['authors'];
+    protected $with = ['authors'];
     
     protected static $tableFields = ['title', 'genre', 'language', 'isbn', 'year', 'authors'];
 
