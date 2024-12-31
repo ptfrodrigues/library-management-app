@@ -60,6 +60,10 @@ class Book extends Model
             }
         });
 
+        static::deleted(function ($book) {
+            $book->catalog()->delete();
+        });
+
         static::restoring(function ($book) {
             $book->authors()->withTrashed()->wherePivot('deleted_at', '!=', null)->updateExistingPivot(
                 $book->authors()->withTrashed()->wherePivot('deleted_at', '!=', null)->pluck('authors.id'),
