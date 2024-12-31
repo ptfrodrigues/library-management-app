@@ -26,12 +26,35 @@ Este projeto é uma aplicação para gerir uma biblioteca, permitindo organizar 
      ```bash
      php artisan migrate --seed
      ```
+   - Caso as imagens dos livros não sejam exibidas corretamente, execute novamente:
+     ```bash
+     php artisan migrate:refresh --seed
+     ```
+     Isso ocorre devido à dependência da API para obter os dados.
 
 4. **Iniciar a app**:
    Inicie o servidor local:
    ```bash
    composer run dev
    ```
+
+## Acessos
+
+- **Admin**: admin@library.com | password: password
+- **Manager**: manager@library.com | password: password
+- **Librarian**: librarian@library.com | password: password
+- **Member**: member@library.com | password: password
+
+## Funcionalidades do Catálogo
+
+- Existe um lote de livros disponível que pode ser adicionado ao catálogo.
+- O catálogo permite marcar livros como "featured" (destaques) e definir a sua ordem de exibição.
+- Os livros marcados como "featured" serão exibidos na página principal.
+- A funcionalidade de ordenação permite controlar a ordem em que os livros aparecem no catálogo.
+
+- O catálogo permite marcar livros como "featured" (destaques) e definir a sua ordem de exibição.
+- Os livros marcados como "featured" serão exibidos na página principal.
+- A funcionalidade de ordenação permite controlar a ordem em que os livros aparecem no catálogo.
 
 ## Funções Disponíveis
 
@@ -89,4 +112,8 @@ O seeder `RolePermissionSeeder` cria as permissões e atribui-as aos respetivos 
 ## Considerações Finais
 
 Com esta aplicação, é possível gerir eficientemente uma biblioteca, selecionar os livros a serem exibidos, e gerir utilizadores com diferentes níveis de acesso. A integração com uma API externa permite obter dados fictícios para testes e simulação de funcionalidades.
+
+## GitHub
+
+O repositório do projeto está disponível no GitHub: [Library Management App](https://github.com/ptfrodrigues/library-management-app.git)
 

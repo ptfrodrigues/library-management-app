@@ -12,6 +12,8 @@ class AuthorBookSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->command->info('  Um momento professor!!! A arrumar as prateleiras...');
+
         $factory = new AuthorBookFactory();
 
         $factory->loadOpenLibraryCache();
@@ -20,10 +22,8 @@ class AuthorBookSeeder extends Seeder
             for ($i = 0; $i < 50; $i++) {
                 $data = $factory->definition();
 
-                // Criar livro
                 $book = Book::create($data['book']);
 
-                // Preparar autores para upsert
                 $authorsData = [];
                 foreach ($data['authors'] as $authorData) {
                     $authorsData[] = [
@@ -33,21 +33,18 @@ class AuthorBookSeeder extends Seeder
                     ];
                 }
 
-                // Upsert em batch
                 Author::upsert(
                     $authorsData,
                     ['first_name', 'last_name'],
                     ['country']
                 );
 
-                // Buscar os IDs dos autores
                 $authorIds = collect($authorsData)->map(function ($authorDatum) {
                     return Author::where('first_name', $authorDatum['first_name'])
                                  ->where('last_name',  $authorDatum['last_name'])
                                  ->value('id');
                 })->filter()->all();
 
-                // Associar autores ao livro
                 $book->authors()->attach($authorIds);
             }
         });

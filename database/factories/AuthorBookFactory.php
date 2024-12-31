@@ -15,42 +15,30 @@ class AuthorBookFactory extends Factory
     private const BATCH_SIZE       = 100;
     private const MAX_TITLE_LENGTH = 60;
 
-    // Em vez de arrays e in_array, usamos arrays associativos para marcação rápida.
     private static array $usedTitles = [];
     private static array $usedIsbns  = [];
 
     /** @var Collection|null */
     private static ?Collection $bookCache = null;
 
-    /**
-     * Método padrão chamado ao fazer Book::factory()->create()
-     */
     public function definition(): array
     {
-        // Garante que a cache está carregada (API já chamada, se necessário).
         $this->ensureBookCacheIsLoaded();
 
-        // Tenta obter o próximo registo da cache.
         $bookData = $this->getNextCachedBook();
         if ($bookData !== null) {
             return $bookData;
         }
 
-        // Caso a cache esteja vazia ou sem dados válidos, gera dados fictícios.
         return $this->generateFakeBookData();
     }
 
-    /**
-     * Método para forçar a pré-carga da API antes de executar o seeder.
-     */
+
     public function loadOpenLibraryCache(): void
     {
         $this->ensureBookCacheIsLoaded();
     }
 
-    /**
-     * Garante que a cache está carregada. Só chama a API se for nulo ou estiver vazia.
-     */
     private function ensureBookCacheIsLoaded(): void
     {
         if (empty(self::$bookCache)) {
@@ -58,9 +46,7 @@ class AuthorBookFactory extends Factory
         }
     }
 
-    /**
-     * Faz a chamada à API da OpenLibrary e devolve uma colecção com os livros filtrados.
-     */
+
     private function fetchBooksFromOpenLibrary(): Collection
     {
         try {
@@ -81,13 +67,10 @@ class AuthorBookFactory extends Factory
             Log::error('Erro ao obter livros da Open Library: '.$e->getMessage());
         }
 
-        // Se falhar, retorna colecção vazia
         return collect();
     }
 
-    /**
-     * Verifica se o registo do livro traz os dados mínimos e passa nas validações.
-     */
+
     private function isValidBook(array $book): bool
     {
         $title = $book['title'] ?? null;
@@ -102,22 +85,18 @@ class AuthorBookFactory extends Factory
         return true;
     }
 
-    /**
-     * Retorna o próximo livro da cache, já formatado, ou null se não houver.
-     */
+
     private function getNextCachedBook(): ?array
     {
-        // Enquanto existirem livros na cache, retira o primeiro e valida duplicados.
         while (self::$bookCache && self::$bookCache->isNotEmpty()) {
             $bookData = self::$bookCache->shift();
             $title    = $bookData['book']['title'];
             $isbn     = $bookData['book']['isbn'];
 
             if (isset(self::$usedTitles[$title]) || isset(self::$usedIsbns[$isbn])) {
-                continue; // Se já usados, ignora e continua.
+                continue;
             }
 
-            // Marca como usados e retorna.
             self::$usedTitles[$title] = true;
             self::$usedIsbns[$isbn]   = true;
 
@@ -127,9 +106,6 @@ class AuthorBookFactory extends Factory
         return null;
     }
 
-    /**
-     * Formata o registo bruto da OpenLibrary para o array que o seeder precisa.
-     */
     private function formatBookData(array $book): array
     {
         $title  = $book['title'] ?? 'Untitled';
@@ -150,20 +126,15 @@ class AuthorBookFactory extends Factory
         ];
     }
 
-    /**
-     * Se não houver mais dados válidos na cache, gera dados fictícios.
-     */
+
     private function generateFakeBookData(): array
     {
-        // Gera título que não exceda 60 caracteres e não duplicado.
         do {
             $title = $this->faker->unique()->sentence(3, true);
         } while (isset(self::$usedTitles[$title]) || strlen($title) > self::MAX_TITLE_LENGTH);
 
-        // Marca o título como utilizado.
         self::$usedTitles[$title] = true;
 
-        // Gera ISBN único.
         $isbn = $this->getUniqueIsbn();
         self::$usedIsbns[$isbn] = true;
 
@@ -181,9 +152,7 @@ class AuthorBookFactory extends Factory
         ];
     }
 
-    /**
-     * Extrai autores do registo ou gera fictícios se não existirem.
-     */
+
     private function extractAuthors(array $book): array
     {
         $authors = [];
@@ -204,9 +173,7 @@ class AuthorBookFactory extends Factory
         return $authors ?: $this->generateFakeAuthors();
     }
 
-    /**
-     * Gera 1 a 3 autores fictícios.
-     */
+
     private function generateFakeAuthors(): array
     {
         $count   = $this->faker->numberBetween(1, 3);
@@ -221,9 +188,7 @@ class AuthorBookFactory extends Factory
         return $authors;
     }
 
-    /**
-     * Retorna o ano válido, entre 1000 e o ano actual, ou null se for inválido.
-     */
+  
     private function extractValidYear($year): ?int
     {
         if (!$year) {
@@ -234,12 +199,8 @@ class AuthorBookFactory extends Factory
         return ($year >= 1000 && $year <= date('Y')) ? $year : null;
     }
 
-    /**
-     * Gera um ISBN de 13 dígitos único ou valida o da API, garantindo não duplicar.
-     */
     private function getUniqueIsbn(?string $apiIsbn = null): string
     {
-        // Se a API forneceu um ISBN de 13 dígitos e ainda não foi usado, aproveita.
         if (
             $apiIsbn &&
             strlen($apiIsbn) === 13 &&
@@ -248,7 +209,6 @@ class AuthorBookFactory extends Factory
             return $apiIsbn;
         }
 
-        // Caso contrário, gera um único.
         do {
             $isbn = $this->faker->unique()->isbn13;
         } while (isset(self::$usedIsbns[$isbn]));

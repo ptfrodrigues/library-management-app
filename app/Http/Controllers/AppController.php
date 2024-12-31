@@ -13,13 +13,27 @@ class AppController extends Controller
 {
     public function index(): View
     {
-        $latestBooks = Catalog::with(['book.authors'])
+        $featuredBooks = Catalog::with(['book.authors'])
+            ->where('is_featured', true)
             ->orderBy('display_order')
             ->take(5)
             ->get()
-            ->map(function ($catalog) {
-                return $catalog->book;
-            });
+            ->pluck('book');
+
+        $remainingCount = 5 - $featuredBooks->count();
+
+        if ($remainingCount > 0) {
+            $nonFeaturedBooks = Catalog::with(['book.authors'])
+                ->where('is_featured', false)
+                ->orderBy('display_order')
+                ->take($remainingCount)
+                ->get()
+                ->pluck('book');
+
+            $latestBooks = $featuredBooks->concat($nonFeaturedBooks);
+        } else {
+            $latestBooks = $featuredBooks;
+        }
 
         $featuredAuthors = $latestBooks->flatMap(function ($book) {
             return $book->authors->map(function ($author) use ($book) {

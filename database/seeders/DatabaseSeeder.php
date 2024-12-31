@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             //AuthorSeeder::class,
             //BookSeeder::class,
             AuthorBookSeeder::class,
+            CatalogSeeder::class,
+
         ]);
 
         User::factory()->create([
