@@ -1,66 +1,92 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Biblioteca - Aplicação de Gestão
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este projeto é uma aplicação para gerir uma biblioteca, permitindo organizar um grande volume de livros e escolher quais serão exibidos. A aplicação está conectada a uma API para simular livros e as suas respetivas imagens.
 
-## About Laravel
+## Como começar após clonar o projeto
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. **Instalar dependências**:
+   Após clonar o repositório, instale todas as dependências do projeto executando:
+   ```bash
+   composer install
+   npm install
+   npm run dev
+   ```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+2. **Configuração do ficheiro `.env`**:
+   - Copie o ficheiro `.env.example` para `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - Atualize as configurações no ficheiro `.env` conforme necessário. Principais diferenças para o `.env.example`:
+     - **DB_DATABASE, DB_USERNAME, DB_PASSWORD**: Configure os dados do banco de dados para corresponder ao seu ambiente.
+     - **APP_URL**: Certifique-se de que reflete a URL correta da aplicação.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+3. **Migrar e popular a base de dados**:
+   - Execute as migrações e seeders:
+     ```bash
+     php artisan migrate --seed
+     ```
 
-## Learning Laravel
+4. **Iniciar a app**:
+   Inicie o servidor local:
+   ```bash
+   composer run dev
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Funções Disponíveis
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+A aplicação define quatro funções principais com permissões específicas, utilizando o pacote [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission):
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. **Admin**:
+   - Acesso total a todas as funcionalidades.
+   - Permissões: Criar, editar, eliminar livros e autores; visualizar, criar, editar e eliminar utilizadores; gerir o dashboard; entre outras.
 
-## Laravel Sponsors
+2. **Manager**:
+   - Gerir livros, autores e utilizadores.
+   - Permissões: Criar, editar e eliminar livros e autores; visualizar e gerir utilizadores; gerir o catálogo; aceder ao dashboard.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+3. **Librarian**:
+   - Foco na gestão básica.
+   - Permissões: Criar e editar livros e autores; visualizar utilizadores; aceder ao catálogo e ao dashboard.
 
-### Premium Partners
+4. **Member**:
+   - Acesso limitado ao catálogo.
+   - Permissões: Apenas visualizar o catálogo.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Dependências do Projeto
 
-## Contributing
+- **Backend**:
+  - Laravel (framework principal).
+  - Spatie Laravel Permission (gestão de permissões).
+  - Faker (para gerar dados fictícios).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Frontend**:
+  - Tailwind CSS (para estilos).
+  - Livewire (componentes dinâmicos em Laravel).
 
-## Code of Conduct
+- **Outras**:
+  - API para simulação de livros e imagens.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Estrutura de Permissões e Seeders
 
-## Security Vulnerabilities
+### Permissões Criadas
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- `create_books`, `edit_books`, `delete_books`
+- `create_authors`, `edit_authors`, `delete_authors`
+- `view_users`, `create_users`, `edit_users`, `delete_users`
+- `access_dashboard`, `force_delete`
+- `view_catalog`, `create_catalog`, `edit_catalog`, `delete_catalog`
 
-## License
+### Seeders
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+O seeder `RolePermissionSeeder` cria as permissões e atribui-as aos respetivos papéis:
+
+- **Admin**: Todas as permissões.
+- **Manager**: Permissões relacionadas à gestão de livros, autores e utilizadores.
+- **Librarian**: Permissões de gestão básica e visualização.
+- **Member**: Apenas visualização do catálogo.
+
+## Considerações Finais
+
+Com esta aplicação, é possível gerir eficientemente uma biblioteca, selecionar os livros a serem exibidos, e gerir utilizadores com diferentes níveis de acesso. A integração com uma API externa permite obter dados fictícios para testes e simulação de funcionalidades.
+

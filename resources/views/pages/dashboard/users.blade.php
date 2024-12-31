@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('dashboard-content')
-    <div class="container mx-auto mt-20 py-12">
+    <div class="container mx-auto py-12">
         <h1 class="text-4xl font-display font-bold mb-8 text-primary">Users</h1>
 
         @if(session('success'))

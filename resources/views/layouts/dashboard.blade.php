@@ -6,7 +6,7 @@
 
 @section('content')
 
-    <div id="main" class=" mx-auto px-4 py-8 text-text">
+    <div id="main" class=" mx-auto px-4 text-text">
         
         @yield('dashboard-content')
     </div>
