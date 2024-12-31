@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +12,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $this->call([
+            RolePermissionSeeder::class,
+            AdminUserSeeder::class,
+            //AuthorSeeder::class,
+            //BookSeeder::class,
+            AuthorBookSeeder::class,
+            CatalogSeeder::class,
+
+        ]);
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+            'name' => 'Manager User',
+            'email' => 'manager@library.com',
+        ])->assignRole('manager');
+        User::factory()->create([
+            'name' => 'Librarian User',
+            'email' => 'librarian@library.com',
+        ])->assignRole('librarian');
+        User::factory()->create([
+            'name' => 'Member User',
+            'email' => 'member@library.com',
+        ])->assignRole('member');
     }
 }
+
